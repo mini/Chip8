@@ -1,15 +1,13 @@
 package mini.chip8;
 
-import java.util.Arrays;
 import java.util.Random;
 
 public class Chip8 {
 	private static final int MEMORY_SIZE = 0x1000;
 	private static final int LOAD_INDEX = 0x200;
 	private static final int NUM_REGISTERS = 16;
+	private static final int STACK_SIZE = 16;
 	private static final int NUM_KEYS = 16;
-	private static final int GFX_WIDTH = 64;
-	private static final int GFX_HEIGHT = 32;
 	private static final int VF = 0xF;
 
 	private static final int[] FONT_SET = {
@@ -32,6 +30,7 @@ public class Chip8 {
 	};
 
 	private Random rand;
+	private Screen screen;
 
 	/* State */
 	// TODO change to proper size
@@ -45,19 +44,18 @@ public class Chip8 {
 	private int sp; // u16 could be u8
 	private int[] stack; // u16 * 16
 
-	private byte[] gfx;
-
 	private int delayTimer; // u8
 	private int soundTimer; // u8
 
 	private boolean[] keys;
 
-	public Chip8() {
+	public Chip8(Screen screen) {
 		rand = new Random(System.nanoTime());
+		this.screen = screen;
 		reset();
 	}
 
-	private void reset() {
+	public void reset() {
 		memory = new int[MEMORY_SIZE];
 		System.arraycopy(FONT_SET, 0, memory, 0, 16 * 5);
 
@@ -66,9 +64,10 @@ public class Chip8 {
 		opcode = 0;
 		I = 0;
 		pc = LOAD_INDEX;
-		sp = 0;
+		drawFlag = false;
 
-		gfx = new byte[GFX_WIDTH * GFX_HEIGHT];
+		sp = 0;
+		stack = new int[STACK_SIZE];
 
 		delayTimer = 0;
 		soundTimer = 0;
@@ -76,10 +75,10 @@ public class Chip8 {
 		keys = new boolean[NUM_KEYS];
 	}
 
-	public void load(byte[] src) {
+	public void load(byte[] src) throws IndexOutOfBoundsException {
 		if (src.length > MEMORY_SIZE - LOAD_INDEX) {
-			System.err.println("File too big");
-			System.exit(-1);
+			throw new IndexOutOfBoundsException(String.format("File too big. (expected <=%d Bytes got %d Bytes)",
+			        MEMORY_SIZE - LOAD_INDEX, src.length));
 		}
 
 		for (int i = 0; i < src.length; i++) {
@@ -87,28 +86,12 @@ public class Chip8 {
 		}
 	}
 
-	public void run() {
+	void step() {
+		opcode = memory[pc] << 8 | memory[pc + 1];
 
-		while (true) {
-			opcode = memory[pc] << 8 | memory[pc + 1];
-
-			step();
-
-			if (delayTimer > 0) {
-				delayTimer--;
-			}
-
-			if (soundTimer > 0) {
-				soundTimer--;
-				if (soundTimer == 0) {
-					System.out.println("Beep");
-				}
-			}
-		}
-	}
-
-	private void step() {
 		int oldpc = pc;
+
+		System.out.printf("pc: 0x%X ", pc);
 
 		int vx = (opcode & 0x0F00) >> 8; // X
 		int vy = (opcode & 0x00F0) >> 4; // Y
@@ -120,7 +103,8 @@ public class Chip8 {
 			case 0x0000:
 				switch (opcode & 0x000F) {
 					case 0x0: // 00E0 - CLS
-						Arrays.fill(gfx, (byte) 0);
+						screen.clear();
+						drawFlag = true;
 						break;
 					case 0xE: // 00EE - RET
 						pc = stack[sp--];
@@ -133,7 +117,7 @@ public class Chip8 {
 				pc = addr;
 				break;
 			case 0x2000: // 2NNN - CALL
-				stack[sp++] = addr; // TODO check if ++sp
+				stack[sp++] = addr;
 				pc = addr;
 				break;
 			case 0x3000: // 3XNN - SE Vx, byte
@@ -213,14 +197,13 @@ public class Chip8 {
 				regs[vx] = rand.nextInt(256) & val;
 				break;
 			case 0xD000: // DXYN - DRW Vx, Vy, nibble
+				drawFlag = true;
 				regs[VF] = 0;
 				for (int y = 0; y < nib; y++) {
 					int spriteRow = memory[I + y];
 					for (int x = 0; x < 8; x++) {
 						if ((spriteRow & (0x80 >> x)) > 0) { // Sprite Pixel set
-							int gfxIndex = regs[vx] + x + (regs[vy] + y) * GFX_WIDTH;
-							gfx[gfxIndex] ^= 1;
-							if (gfx[gfxIndex] == 0) {
+							if (screen.togglePixel(regs[vx] + x, regs[vy] + y) == 0) {
 								regs[VF] = 1;
 							}
 						}
@@ -288,9 +271,31 @@ public class Chip8 {
 				NOP();
 		}
 
+		System.out.printf("op: 0x%X \n", opcode);
+
 		if (pc == oldpc) { // Didn't jump
 			pc += 2;
 		}
+
+		if (delayTimer > 0) {
+			delayTimer--;
+		}
+
+		if (soundTimer > 0) {
+			soundTimer--;
+			if (soundTimer == 0) {
+				System.out.println("Beep");
+			}
+		}
+
+	}
+
+	boolean shouldDraw() {
+		return drawFlag;
+	}
+
+	void resetDrawFlag() {
+		drawFlag = false;
 	}
 
 	private void NOP() {
@@ -301,5 +306,4 @@ public class Chip8 {
 		System.out.printf("0x%X not implemented", opcode);
 		System.exit(1);
 	}
-
 }

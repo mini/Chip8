@@ -1,24 +1,33 @@
 package mini.chip8;
 
 import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Paths;
 
-public class App {
+import javafx.application.Application;
+import javafx.fxml.FXMLLoader;
+import javafx.scene.Scene;
+import javafx.scene.layout.Pane;
+import javafx.stage.Stage;
+
+public class App extends Application {
 
 	public static void main(String[] args) {
-		System.out.println("test print plz ignore");
-		new Chip8().load(readFile("../roms/BLINKY"));
+		launch(args);
 	}
-	
 
-	public static byte[] readFile(String romPath){
-		try {
-			return Files.readAllBytes(Paths.get(romPath));
-		} catch(IOException e) {
-			e.printStackTrace();
-			System.exit(1);
-		}
-		return null;
+	@Override
+	public void start(Stage primaryStage) throws IOException {
+
+		FXMLLoader loader = new FXMLLoader(getClass().getResource("/fxml/screen.fxml"));
+		Pane root = loader.<Pane>load();
+		MainController controller = loader.<MainController>getController();
+		controller.setup(primaryStage);
+
+		primaryStage.setScene(new Scene(root));
+		primaryStage.setTitle("Chip-8 Emulator");
+		primaryStage.setResizable(false);
+
+		primaryStage.show();
+
 	}
+
 }

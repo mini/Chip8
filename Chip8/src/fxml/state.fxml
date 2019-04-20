@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.TableColumn?>
+<?import javafx.scene.control.TableView?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.layout.ColumnConstraints?>
+<?import javafx.scene.layout.GridPane?>
+<?import javafx.scene.layout.RowConstraints?>
+<?import javafx.scene.layout.VBox?>
+
+<VBox maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="546.0" prefWidth="386.0" xmlns="http://javafx.com/javafx/8.0.171" xmlns:fx="http://javafx.com/fxml/1">
+   <children>
+      <GridPane prefHeight="119.0" prefWidth="386.0" VBox.vgrow="NEVER">
+        <columnConstraints>
+          <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
+          <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
+        </columnConstraints>
+        <rowConstraints>
+          <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+          <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+        </rowConstraints>
+         <children>
+            <AnchorPane prefHeight="200.0" prefWidth="200.0">
+               <children>
+                  <Label layoutX="45.0" layoutY="6.0" text="Program Counter" AnchorPane.topAnchor="6.0" />
+                  <TextField fx:id="pcTextField" editable="false" layoutX="14.0" layoutY="24.0" />
+               </children>
+            </AnchorPane>
+            <AnchorPane prefHeight="200.0" prefWidth="200.0" GridPane.columnIndex="1">
+               <children>
+                  <Label layoutX="67.0" layoutY="6.0" text="I Register" AnchorPane.topAnchor="6.0" />
+                  <TextField fx:id="iTextField" editable="false" layoutX="14.0" layoutY="24.0" />
+               </children>
+            </AnchorPane>
+            <AnchorPane prefHeight="200.0" prefWidth="200.0" GridPane.rowIndex="1">
+               <children>
+                  <Label layoutX="60.0" layoutY="6.0" text="Delay Timer" AnchorPane.topAnchor="6.0" />
+                  <TextField fx:id="delayTextField" editable="false" layoutX="14.0" layoutY="23.0" />
+               </children>
+            </AnchorPane>
+            <AnchorPane prefHeight="200.0" prefWidth="200.0" GridPane.columnIndex="1" GridPane.rowIndex="1">
+               <children>
+                  <Label layoutX="58.0" layoutY="6.0" text="Sound Timer" AnchorPane.topAnchor="6.0" />
+                  <TextField fx:id="soundTextField" editable="false" layoutX="14.0" layoutY="23.0" />
+               </children>
+            </AnchorPane>
+         </children>
+      </GridPane>
+      <TableView fx:id="tbl" prefHeight="410.0" prefWidth="386.0">
+        <columns>
+          <TableColumn editable="false" prefWidth="41.0" sortable="false" />
+          <TableColumn editable="false" prefWidth="129.0" sortable="false" text="Registers" />
+            <TableColumn editable="false" prefWidth="118.0" sortable="false" text="Stack" />
+            <TableColumn editable="false" prefWidth="66.0" sortable="false" text="Key" />
+        </columns>
+      </TableView>
+   </children>
+   <padding>
+      <Insets bottom="7.0" left="7.0" right="7.0" top="7.0" />
+   </padding>
+</VBox>
