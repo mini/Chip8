@@ -89,10 +89,10 @@ public class Chip8 {
 
 	void step() {
 		opcode = memory[pc] << 8 | memory[pc + 1];
+		System.out.printf("pc: 0x%X ", pc);
 		pc += 2;
 //		int oldpc = pc;
 
-		System.out.printf("pc: 0x%X ", pc);
 
 		int vx = (opcode & 0x0F00) >> 8; // X
 		int vy = (opcode & 0x00F0) >> 4; // Y
@@ -179,6 +179,7 @@ public class Chip8 {
 					case 0xE: // 8XYE - SHL Vx
 						regs[VF] = (regs[vx] & 0x80) >> 7;
 						regs[vx] <<= 1;
+						regs[vx] &= 0xFF;
 						break;
 					default:
 						NOP();
@@ -261,17 +262,19 @@ public class Chip8 {
 						I = regs[vx] * 5;
 						break;
 					case 0x33: // FX33 - LD B, Vx
-						memory[I] = regs[vx] / 100;
-						memory[I + 1] = (regs[vx] / 10) % 10;
-						memory[I + 2] = regs[vx] % 10;
+						val = regs[vx];
+						memory[I + 2] = val % 10; // ones
+						val /= 10;
+						memory[I + 1] = val % 10; // tens
+						memory[I] = val / 10;// hundreds
 						break;
 					case 0x55: // FX55 - LD [I], Vx
-						for (int v = 0; v < vx; v++) {
+						for (int v = 0; v <= vx; v++) {
 							memory[I + v] = regs[v];
 						}
 						break;
 					case 0x65: // FX65 - LD Vx, [I]
-						for (int v = 0; v < vx; v++) {
+						for (int v = 0; v <= vx; v++) {
 							regs[v] = memory[I + v];
 						}
 						break;

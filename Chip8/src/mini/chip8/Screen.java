@@ -44,7 +44,12 @@ public class Screen extends Canvas {
 	}
 
 	public byte togglePixel(int x, int y) {
+		try {
 		gfx[x + y * GFX_WIDTH] ^= 1;
+		} catch (Exception e) {
+			System.err.println(x + ":" + y);
+			System.exit(1);
+		}
 		return gfx[x + y * GFX_WIDTH];
 	}
 
