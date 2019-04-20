@@ -36,6 +36,7 @@ public class MainController {
 		fileChooser = new FileChooser();
 		
 		cpu = new Chip8(screen);
+		screen.init();
 		screen.render();
 
 		timeline = new Timeline(new KeyFrame(Duration.seconds(0.003), cycle -> {

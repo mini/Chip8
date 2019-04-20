@@ -26,14 +26,17 @@ public class Screen extends Canvas {
 
 	public Screen(double width, double height) {
 		super(width, height);
+	}
 
-		scaleX = width / GFX_WIDTH;
-		scaleY = height / GFX_HEIGHT;
+	public void init() {
+		scaleX = widthProperty().get() / GFX_WIDTH;
+		scaleY = heightProperty().get() / GFX_HEIGHT;
 
 		gc = getGraphicsContext2D();
 		gfx = new byte[GFX_WIDTH * GFX_HEIGHT];
 
 		clear();
+
 	}
 
 	public byte getPixel(int x, int y) {
@@ -55,7 +58,7 @@ public class Screen extends Canvas {
 		for (int y = 0; y < GFX_HEIGHT; y++) {
 			for (int x = 0; x < GFX_WIDTH; x++) {
 				gc.setFill(gfx[x + y * GFX_WIDTH] == 1 ? FG : BG);
-				gc.fillRect(scaleX, y * scaleY, scaleX, scaleY);
+				gc.fillRect(x * scaleX, y * scaleY, scaleX, scaleY);
 			}
 		}
 	}
