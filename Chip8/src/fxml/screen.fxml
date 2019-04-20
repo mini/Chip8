@@ -5,7 +5,7 @@
 <?import javafx.scene.control.ToolBar?>
 <?import javafx.scene.layout.AnchorPane?>
 
-<AnchorPane prefHeight="360.0" prefWidth="640.0" xmlns="http://javafx.com/javafx/8.0.171" xmlns:fx="http://javafx.com/fxml/1" fx:controller="mini.chip8.MainController">
+<AnchorPane prefHeight="360.0" prefWidth="640.0" onKeyPressed="#keyDown" onKeyReleased="#keyUp" xmlns="http://javafx.com/javafx/8.0.171" xmlns:fx="http://javafx.com/fxml/1" fx:controller="mini.chip8.MainController">
    <children>
       <Screen fx:id="screen" height="320.0" width="640.0" AnchorPane.bottomAnchor="0.0" />
       <ToolBar layoutX="7.0" layoutY="7.0" prefHeight="40.0" prefWidth="200.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">

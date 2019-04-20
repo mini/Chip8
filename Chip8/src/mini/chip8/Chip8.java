@@ -1,5 +1,6 @@
 package mini.chip8;
 
+import java.util.Arrays;
 import java.util.Random;
 
 public class Chip8 {
@@ -88,8 +89,8 @@ public class Chip8 {
 
 	void step() {
 		opcode = memory[pc] << 8 | memory[pc + 1];
-
-		int oldpc = pc;
+		pc += 2;
+//		int oldpc = pc;
 
 		System.out.printf("pc: 0x%X ", pc);
 
@@ -122,17 +123,17 @@ public class Chip8 {
 				break;
 			case 0x3000: // 3XNN - SE Vx, byte
 				if (regs[vx] == val) {
-					pc += 4;
+					pc += 2;
 				}
 				break;
 			case 0x4000: // 4XNN - SNE Vx, byte
 				if (regs[vx] != val) {
-					pc += 4;
+					pc += 2;
 				}
 				break;
 			case 0x5000: // 5XY0 - SE Vx, Vy
 				if (regs[vx] == regs[vy]) {
-					pc += 4;
+					pc += 2;
 				}
 				break;
 			case 0x6000: // 6xNN - LD Vx, byte
@@ -140,6 +141,7 @@ public class Chip8 {
 				break;
 			case 0x7000: // 7XNN - ADD Vx, byte
 				regs[vx] += val;
+				regs[vx] &= 0xFF;
 				break;
 			case 0x8000:
 				switch (opcode & 0x000F) {
@@ -184,7 +186,7 @@ public class Chip8 {
 				break;
 			case 0x9000: // 9XY0 - SNE Vx, Vy
 				if (regs[vx] != regs[vy]) {
-					pc += 4;
+					pc += 2;
 				}
 				break;
 			case 0xA000: // ANNN - LDI, addr
@@ -215,12 +217,12 @@ public class Chip8 {
 				switch (opcode & 0x000F) {
 					case 0xE: // EX9E - SKP Vx
 						if (keys[regs[vx]]) { // TODO Is this right?
-							pc += 4;
+							pc += 2;
 						}
 						break;
 					case 0x1: // EXA1 - SKNP Vx
 						if (!keys[regs[vx]]) {
-							pc += 4;
+							pc += 2;
 						}
 						break;
 					default:
@@ -233,7 +235,17 @@ public class Chip8 {
 						regs[vx] = delayTimer;
 						break;
 					case 0x0A: // FX0A - LD Vx, Key
-						TODO(); // TODO
+						boolean keyDown = false;
+						for(int i = 0; i < NUM_KEYS; i++) {
+							if(keys[i]) {
+								regs[vx] = i;
+								keyDown = true;
+								break;
+							}
+						}
+						if(!keyDown) {
+							pc -= 2; //TODO should really make this a listener not while loop...
+						}
 						break;
 					case 0x15: // FX15 - LD DT, Vx
 						delayTimer = regs[vx];
@@ -271,12 +283,17 @@ public class Chip8 {
 				NOP();
 		}
 
-		System.out.printf("op: 0x%X \n", opcode);
+		System.out.printf("op: 0x%X %b %s\n", opcode,drawFlag, Arrays.toString(regs));
 
-		if (pc == oldpc) { // Didn't jump
-			pc += 2;
-		}
+//		if (pc == oldpc) { // Didn't jump
+//			pc += 2;
+//		}
 
+		
+
+	}
+	
+	public void updateTimer() {
 		if (delayTimer > 0) {
 			delayTimer--;
 		}
@@ -287,7 +304,6 @@ public class Chip8 {
 				System.out.println("Beep");
 			}
 		}
-
 	}
 
 	boolean shouldDraw() {
@@ -297,13 +313,12 @@ public class Chip8 {
 	void resetDrawFlag() {
 		drawFlag = false;
 	}
+	
+	void setKey(int n, boolean state) {
+		keys[n] = state;
+	}
 
 	private void NOP() {
 		System.out.printf("0x%X unknown opcode", opcode);
-	}
-
-	private void TODO() {
-		System.out.printf("0x%X not implemented", opcode);
-		System.exit(1);
 	}
 }
