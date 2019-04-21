@@ -58,7 +58,7 @@ public class Chip8 {
 
 	public void reset() {
 		memory = new int[MEMORY_SIZE];
-		System.arraycopy(FONT_SET, 0, memory, 0, 16 * 5);
+		System.arraycopy(FONT_SET, 0, memory, 0, FONT_SET.length);
 
 		regs = new int[NUM_REGISTERS];
 
@@ -91,23 +91,21 @@ public class Chip8 {
 		opcode = memory[pc] << 8 | memory[pc + 1];
 		System.out.printf("pc: 0x%X ", pc);
 		pc += 2;
-//		int oldpc = pc;
 
-
-		int vx = (opcode & 0x0F00) >> 8; // X
-		int vy = (opcode & 0x00F0) >> 4; // Y
-		int addr = opcode & 0x0FFF; // NNN
-		int val = opcode & 0x00FF; // NN
-		int nib = opcode & 0x000F; // N
+		int vx = (opcode & 0x0F00) >> 8; 	// 0X00
+		int vy = (opcode & 0x00F0) >> 4; 	// 00Y0
+		int addr = opcode & 0x0FFF; 		// 0NNN
+		int val = opcode & 0x00FF; 			// 00NN
+		int nib = opcode & 0x000F; 			// 000N
 
 		switch (opcode & 0xF000) {
 			case 0x0000:
-				switch (opcode & 0x000F) {
-					case 0x0: // 00E0 - CLS
+				switch (opcode & 0x00FF) {
+					case 0xE0: // 00E0 - CLS
 						screen.clear();
 						drawFlag = true;
 						break;
-					case 0xE: // 00EE - RET
+					case 0xEE: // 00EE - RET
 						pc = stack[sp--];
 						break;
 					default: // 0NNN - IGNORED
@@ -118,7 +116,7 @@ public class Chip8 {
 				pc = addr;
 				break;
 			case 0x2000: // 2NNN - CALL
-				stack[sp++] = addr;
+				stack[++sp] = pc;
 				pc = addr;
 				break;
 			case 0x3000: // 3XNN - SE Vx, byte
@@ -186,7 +184,7 @@ public class Chip8 {
 				}
 				break;
 			case 0x9000: // 9XY0 - SNE Vx, Vy
-				if (regs[vx] != regs[vy]) {
+				if (regs[vx] != regs[vy] && nib == 0) {
 					pc += 2;
 				}
 				break;
@@ -195,6 +193,7 @@ public class Chip8 {
 				break;
 			case 0xB000: // BNNN - JP0, addr
 				pc = regs[0] + addr;
+				pc &= 0xFFF;
 				break;
 			case 0xC000: // CXNN - RND Vx, byte
 				regs[vx] = rand.nextInt(256) & val;
@@ -215,13 +214,13 @@ public class Chip8 {
 
 				break;
 			case 0xE000:
-				switch (opcode & 0x000F) {
-					case 0xE: // EX9E - SKP Vx
-						if (keys[regs[vx]]) { // TODO Is this right?
+				switch (opcode & 0x00FF) {
+					case 0x9E: // EX9E - SKP Vx
+						if (keys[regs[vx]]) {
 							pc += 2;
 						}
 						break;
-					case 0x1: // EXA1 - SKNP Vx
+					case 0xA1: // EXA1 - SKNP Vx
 						if (!keys[regs[vx]]) {
 							pc += 2;
 						}
@@ -236,16 +235,13 @@ public class Chip8 {
 						regs[vx] = delayTimer;
 						break;
 					case 0x0A: // FX0A - LD Vx, Key
-						boolean keyDown = false;
-						for(int i = 0; i < NUM_KEYS; i++) {
-							if(keys[i]) {
+						pc -= 2;
+						for (int i = 0; i < NUM_KEYS; i++) {
+							if (keys[i]) {
 								regs[vx] = i;
-								keyDown = true;
+								pc += 2;
 								break;
 							}
-						}
-						if(!keyDown) {
-							pc -= 2; //TODO should really make this a listener not while loop...
 						}
 						break;
 					case 0x15: // FX15 - LD DT, Vx
@@ -256,7 +252,8 @@ public class Chip8 {
 						break;
 					case 0x1E: // FX1E - ADD I, Vx
 						I += regs[vx];
-						I &= 0xFF;
+						regs[VF] = I > 0xFFF ? 1 : 0;
+						I &= 0xFFF;
 						break;
 					case 0x29: // FX29 - LD F, Vx
 						I = regs[vx] * 5;
@@ -270,12 +267,12 @@ public class Chip8 {
 						break;
 					case 0x55: // FX55 - LD [I], Vx
 						for (int v = 0; v <= vx; v++) {
-							memory[I + v] = regs[v];
+							memory[I++] = regs[v];
 						}
 						break;
 					case 0x65: // FX65 - LD Vx, [I]
 						for (int v = 0; v <= vx; v++) {
-							regs[v] = memory[I + v];
+							regs[v] = memory[I++];
 						}
 						break;
 					default:
@@ -286,16 +283,9 @@ public class Chip8 {
 				NOP();
 		}
 
-		System.out.printf("op: 0x%X %b %s\n", opcode,drawFlag, Arrays.toString(regs));
-
-//		if (pc == oldpc) { // Didn't jump
-//			pc += 2;
-//		}
-
-		
-
+		System.out.printf("op: 0x%X %b %s\n", opcode, drawFlag, Arrays.toString(regs));
 	}
-	
+
 	public void updateTimer() {
 		if (delayTimer > 0) {
 			delayTimer--;
@@ -316,12 +306,12 @@ public class Chip8 {
 	void resetDrawFlag() {
 		drawFlag = false;
 	}
-	
+
 	void setKey(int n, boolean state) {
 		keys[n] = state;
 	}
 
 	private void NOP() {
-		System.out.printf("0x%X unknown opcode", opcode);
+//		System.out.printf("0x%X unknown opcode", opcode);
 	}
 }

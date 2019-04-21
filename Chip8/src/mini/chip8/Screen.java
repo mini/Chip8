@@ -14,6 +14,7 @@ public class Screen extends Canvas {
 
 	private static final int GFX_WIDTH = 64;
 	private static final int GFX_HEIGHT = 32;
+	private static final int NUM_PIXELS = GFX_WIDTH * GFX_HEIGHT;
 
 	private double scaleX, scaleY;
 
@@ -40,23 +41,16 @@ public class Screen extends Canvas {
 	}
 
 	public byte getPixel(int x, int y) {
-		return gfx[x + y * GFX_WIDTH];
+		return gfx[(x + y * GFX_WIDTH) % NUM_PIXELS];
 	}
 
 	public byte togglePixel(int x, int y) {
-		try {
-		gfx[x + y * GFX_WIDTH] ^= 1;
-		} catch (Exception e) {
-			System.err.println(x + ":" + y);
-			System.exit(1);
-		}
-		return gfx[x + y * GFX_WIDTH];
+		gfx[(x + y * GFX_WIDTH) % NUM_PIXELS] ^= 1;
+		return gfx[(x + y * GFX_WIDTH) % NUM_PIXELS];
 	}
 
 	public void clear() {
 		Arrays.fill(gfx, (byte) 0);
-		gc.setFill(BG);
-		gc.fillRect(0, 0, GFX_WIDTH * scaleX, GFX_HEIGHT * scaleY);
 	}
 
 	public void render() {

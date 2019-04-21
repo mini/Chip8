@@ -89,6 +89,7 @@ public class MainController {
 				try {
 					cpu.reset();
 					cpu.load(Files.readAllBytes(file.toPath()));
+					screen.clear();
 					runButton.setDisable(false);
 					stepButton.setDisable(false);
 					break;
@@ -114,7 +115,7 @@ public class MainController {
 
 	@FXML
 	private void haltPressed() {
-		runButton.setDisable(true);
+		runButton.setDisable(false);
 		haltButton.setDisable(true);
 		stepButton.setDisable(true);
 		
