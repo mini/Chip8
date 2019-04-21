@@ -141,11 +141,17 @@ public class MainController {
 	
 	@FXML
 	private void keyDown(KeyEvent key) {
-		cpu.setKey(keymap.get(key.getCode()), true);
+		Integer keycode;
+		if((keycode = keymap.get(key.getCode())) != null) {
+			cpu.setKey(keycode, true);
+		}
 	}
 	
 	@FXML
 	private void keyUp(KeyEvent key) {
-		cpu.setKey(keymap.get(key.getCode()), false);
+		Integer keycode;
+		if((keycode = keymap.get(key.getCode())) != null) {
+			cpu.setKey(keycode, false);
+		}
 	}
 }

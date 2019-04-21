@@ -1,6 +1,5 @@
 package mini.chip8;
 
-import java.util.Arrays;
 import java.util.Random;
 
 public class Chip8 {
@@ -89,7 +88,6 @@ public class Chip8 {
 
 	void step() {
 		opcode = memory[pc] << 8 | memory[pc + 1];
-		System.out.printf("pc: 0x%X ", pc);
 		pc += 2;
 
 		int vx = (opcode & 0x0F00) >> 8; 	// 0X00
@@ -130,7 +128,7 @@ public class Chip8 {
 				}
 				break;
 			case 0x5000: // 5XY0 - SE Vx, Vy
-				if (regs[vx] == regs[vy]) {
+				if (regs[vx] == regs[vy] && nib == 0) {
 					pc += 2;
 				}
 				break;
@@ -267,12 +265,12 @@ public class Chip8 {
 						break;
 					case 0x55: // FX55 - LD [I], Vx
 						for (int v = 0; v <= vx; v++) {
-							memory[I++] = regs[v];
+							memory[I + v] = regs[v];
 						}
 						break;
 					case 0x65: // FX65 - LD Vx, [I]
 						for (int v = 0; v <= vx; v++) {
-							regs[v] = memory[I++];
+							regs[v] = memory[I + v];
 						}
 						break;
 					default:
@@ -282,8 +280,6 @@ public class Chip8 {
 			default:
 				NOP();
 		}
-
-		System.out.printf("op: 0x%X %b %s\n", opcode, drawFlag, Arrays.toString(regs));
 	}
 
 	public void updateTimer() {
@@ -312,6 +308,6 @@ public class Chip8 {
 	}
 
 	private void NOP() {
-//		System.out.printf("0x%X unknown opcode", opcode);
+		System.out.printf("0x%X unknown opcode", opcode);
 	}
 }
