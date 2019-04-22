@@ -5,6 +5,7 @@ import java.util.Arrays;
 
 import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
+import javafx.scene.layout.Pane;
 import javafx.scene.paint.Color;
 
 public class Screen extends Canvas {
@@ -16,7 +17,7 @@ public class Screen extends Canvas {
 	private static final int GFX_HEIGHT = 32;
 	private static final int NUM_PIXELS = GFX_WIDTH * GFX_HEIGHT;
 
-	private double scaleX, scaleY;
+	private int scaleX, scaleY;
 
 	private byte[] gfx;
 	private GraphicsContext gc;
@@ -30,14 +31,30 @@ public class Screen extends Canvas {
 	}
 
 	public void init() {
-		scaleX = widthProperty().get() / GFX_WIDTH;
-		scaleY = heightProperty().get() / GFX_HEIGHT;
-
-		gc = getGraphicsContext2D();
 		gfx = new byte[GFX_WIDTH * GFX_HEIGHT];
+		gc = getGraphicsContext2D();
 
-		clear();
+		
+		widthProperty().addListener((obs, oldV, newV) -> {
+			if (oldV != null) {
+				gc.clearRect(0, 0, oldV.doubleValue(), getHeight());
+			}
+			scaleX = (int) (newV.doubleValue() / GFX_WIDTH);
+			render();
+		});
+		heightProperty().addListener((obs, oldV, newV) -> {
+			if (oldV != null) {
+				gc.clearRect(0, 0, getWidth(), oldV.doubleValue());
+			}
+			scaleY = (int) (newV.doubleValue() / GFX_HEIGHT);
+			render();
+		});
 
+		Pane parent = (Pane) getParent();
+		widthProperty().bind(parent.widthProperty());
+		heightProperty().bind(parent.heightProperty());
+
+		render();
 	}
 
 	public byte getPixel(int x, int y) {

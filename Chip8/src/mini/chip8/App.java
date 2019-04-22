@@ -20,14 +20,12 @@ public class App extends Application {
 		FXMLLoader loader = new FXMLLoader(getClass().getResource("/fxml/screen.fxml"));
 		Pane root = loader.<Pane>load();
 		MainController controller = loader.<MainController>getController();
-		controller.setup(primaryStage);
 
 		primaryStage.setScene(new Scene(root));
 		primaryStage.setTitle("Chip-8 Emulator");
-		primaryStage.setResizable(false);
-
+		primaryStage.setResizable(true);
 		primaryStage.show();
-
+		
+		controller.setup(primaryStage);
 	}
-
 }

@@ -32,8 +32,7 @@ public class MainController {
 	private Stage primaryStage;
 	private Chip8 cpu;
 	private Timeline timeline;
-	
-	
+
 	private static HashMap<KeyCode, Integer> keymap;
 	static {
 		keymap = new HashMap<KeyCode, Integer>(16, 1);
@@ -41,66 +40,61 @@ public class MainController {
 		keymap.put(KeyCode.DIGIT2, 2);
 		keymap.put(KeyCode.DIGIT3, 3);
 		keymap.put(KeyCode.DIGIT4, 0xC);
-		
+
 		keymap.put(KeyCode.Q, 4);
 		keymap.put(KeyCode.W, 5);
 		keymap.put(KeyCode.E, 6);
 		keymap.put(KeyCode.R, 0xD);
-		
+
 		keymap.put(KeyCode.A, 7);
 		keymap.put(KeyCode.S, 8);
 		keymap.put(KeyCode.D, 9);
 		keymap.put(KeyCode.F, 0xE);
-		
+
 		keymap.put(KeyCode.Z, 0xA);
 		keymap.put(KeyCode.X, 0);
 		keymap.put(KeyCode.C, 0xB);
 		keymap.put(KeyCode.V, 0xF);
 	}
-	
 
 	void setup(Stage primaryStage) {
 		this.primaryStage = primaryStage;
-		
+
 		fileChooser = new FileChooser();
-		
+
 		cpu = new Chip8(screen);
 		screen.init();
-		screen.render();
 
 		timeline = new Timeline(new KeyFrame(Duration.seconds(0.003), cycle -> {
 			step();
 		}));
-		
+
 		timeline.setCycleCount(Timeline.INDEFINITE);
 	}
 
-
 	@FXML
 	private void loadPressed() {
-		haltPressed();
-		runButton.setDisable(true);
-		
-		while (true) {
-			File file = fileChooser.showOpenDialog(primaryStage);
-			if (file != null) {
-				fileChooser.setInitialDirectory(file.getParentFile());
-				fileChooser.setInitialFileName(file.getName());
-				try {
-					cpu.reset();
-					cpu.load(Files.readAllBytes(file.toPath()));
-					screen.clear();
-					runButton.setDisable(false);
-					stepButton.setDisable(false);
-					break;
-				} catch (IOException e) {
-					e.printStackTrace();
-				} catch (IndexOutOfBoundsException e) {
-					System.out.println(e.getMessage());
-					Alert alert = new Alert(AlertType.WARNING, e.getMessage(), ButtonType.OK);
-					alert.initOwner(primaryStage);
-					alert.showAndWait();
-				}
+		timeline.stop();
+
+		File file = fileChooser.showOpenDialog(primaryStage);
+		if (file != null) {
+			fileChooser.setInitialDirectory(file.getParentFile());
+			fileChooser.setInitialFileName(file.getName());
+			try {
+				cpu.reset();
+				cpu.load(Files.readAllBytes(file.toPath()));
+				screen.clear();
+				runButton.setDisable(false);
+				stepButton.setDisable(false);
+			} catch (IOException e) {
+				e.printStackTrace();
+			} catch (IndexOutOfBoundsException e) {
+				runButton.setDisable(true);
+				haltButton.setDisable(true);
+				stepButton.setDisable(true);
+				Alert alert = new Alert(AlertType.WARNING, e.getMessage(), ButtonType.OK);
+				alert.initOwner(primaryStage);
+				alert.showAndWait();
 			}
 		}
 	}
@@ -117,8 +111,8 @@ public class MainController {
 	private void haltPressed() {
 		runButton.setDisable(false);
 		haltButton.setDisable(true);
-		stepButton.setDisable(true);
-		
+		stepButton.setDisable(false);
+
 		timeline.stop();
 	}
 
@@ -126,10 +120,10 @@ public class MainController {
 	private void stepPressed() {
 		runButton.setDisable(false);
 		timeline.stop();
-		
+
 		step();
 	}
-	
+
 	private void step() {
 		cpu.step();
 		if (cpu.shouldDraw()) {
@@ -138,20 +132,18 @@ public class MainController {
 		}
 		cpu.updateTimer();
 	}
-	
+
 	@FXML
 	private void keyDown(KeyEvent key) {
-		Integer keycode;
-		if((keycode = keymap.get(key.getCode())) != null) {
-			cpu.setKey(keycode, true);
+		if (keymap.containsKey(key.getCode())) {
+			cpu.setKey(keymap.get(key.getCode()), true);
 		}
 	}
-	
+
 	@FXML
 	private void keyUp(KeyEvent key) {
-		Integer keycode;
-		if((keycode = keymap.get(key.getCode())) != null) {
-			cpu.setKey(keycode, false);
+		if (keymap.containsKey(key.getCode())) {
+			cpu.setKey(keymap.get(key.getCode()), false);
 		}
 	}
 }
