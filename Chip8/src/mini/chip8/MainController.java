@@ -8,12 +8,15 @@ import java.util.HashMap;
 import javafx.animation.KeyFrame;
 import javafx.animation.Timeline;
 import javafx.fxml.FXML;
+import javafx.fxml.FXMLLoader;
+import javafx.scene.Scene;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Alert.AlertType;
 import javafx.scene.control.Button;
 import javafx.scene.control.ButtonType;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
+import javafx.scene.layout.Pane;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
 import javafx.util.Duration;
@@ -22,6 +25,7 @@ public class MainController {
 
 	//@formatter:off
 	@FXML private Screen screen;
+	@FXML private Button stateButton;
 	@FXML private Button loadButton;
 	@FXML private Button runButton;
 	@FXML private Button haltButton;
@@ -30,6 +34,8 @@ public class MainController {
 
 	private FileChooser fileChooser;
 	private Stage primaryStage;
+	private Stage stateStage;
+	private StateController stateController;
 	private Chip8 cpu;
 	private Timeline timeline;
 
@@ -70,6 +76,7 @@ public class MainController {
 		}));
 
 		timeline.setCycleCount(Timeline.INDEFINITE);
+
 	}
 
 	@FXML
@@ -82,8 +89,8 @@ public class MainController {
 			fileChooser.setInitialFileName(file.getName());
 			try {
 				cpu.reset();
-				cpu.load(Files.readAllBytes(file.toPath()));
 				screen.clear();
+				cpu.load(Files.readAllBytes(file.toPath()));
 				runButton.setDisable(false);
 				stepButton.setDisable(false);
 			} catch (IOException e) {
@@ -97,6 +104,29 @@ public class MainController {
 				alert.showAndWait();
 			}
 		}
+	}
+
+	@FXML
+	private void statePressed() throws IOException {
+		stateButton.setDisable(true);
+
+		if (stateStage == null) {
+			FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("/fxml/state.fxml"));
+			stateStage = new Stage();
+			stateStage.setResizable(false);
+			stateStage.setTitle("CPU State");
+			stateStage.setScene(new Scene(fxmlLoader.<Pane>load()));
+			stateController = fxmlLoader.<StateController>getController();
+			cpu.setListener(stateController);
+
+			stateStage.setOnCloseRequest(evt -> {
+				stateStage.hide();
+				evt.consume();
+				stateButton.setDisable(false);
+			});
+		}
+
+		stateStage.show();
 	}
 
 	@FXML
@@ -131,6 +161,9 @@ public class MainController {
 			cpu.resetDrawFlag();
 		}
 		cpu.updateTimer();
+		if (stateStage != null && stateStage.isShowing()) {
+			cpu.updateListener();
+		}
 	}
 
 	@FXML

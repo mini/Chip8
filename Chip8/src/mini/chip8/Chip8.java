@@ -49,6 +49,8 @@ public class Chip8 {
 
 	private boolean[] keys;
 
+	private StateListener listener;
+
 	public Chip8(Screen screen) {
 		rand = new Random(System.nanoTime());
 		this.screen = screen;
@@ -295,6 +297,16 @@ public class Chip8 {
 		}
 	}
 
+	public void setListener(StateListener sl) {
+		listener = sl;
+	}
+
+	public void updateListener() {
+		if (listener != null) {
+			listener.update(new State());
+		}
+	}
+
 	boolean shouldDraw() {
 		return drawFlag;
 	}
@@ -309,5 +321,28 @@ public class Chip8 {
 
 	private void NOP() {
 		System.out.printf("0x%X unknown opcode", opcode);
+	}
+
+	class State {
+		public int[] s_regs = new int[NUM_REGISTERS];
+		public int[] s_stack = new int[STACK_SIZE];
+		public boolean[] s_keys = new boolean[NUM_KEYS];
+		public int s_opcode, s_I, s_pc, s_sp, s_delayTimer, s_soundTimer;
+
+		private State() {
+			System.arraycopy(regs, 0, s_regs, 0, NUM_REGISTERS);
+			System.arraycopy(stack, 0, s_stack, 0, STACK_SIZE);
+			System.arraycopy(keys, 0, s_keys, 0, NUM_KEYS);
+			s_opcode = opcode;
+			s_I = I;
+			s_pc = pc;
+			s_sp = sp;
+			s_delayTimer = delayTimer;
+			s_soundTimer = soundTimer;
+		}
+	}
+
+	interface StateListener {
+		public void update(State state);
 	}
 }

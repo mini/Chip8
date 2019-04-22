@@ -3,6 +3,7 @@ package mini.chip8;
 import java.io.IOException;
 
 import javafx.application.Application;
+import javafx.application.Platform;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
 import javafx.scene.layout.Pane;
@@ -24,6 +25,11 @@ public class App extends Application {
 		primaryStage.setScene(new Scene(root));
 		primaryStage.setTitle("Chip-8 Emulator");
 		primaryStage.setResizable(true);
+		
+		primaryStage.setOnCloseRequest(evt ->{
+			Platform.exit();
+		});
+		
 		primaryStage.show();
 		
 		controller.setup(primaryStage);

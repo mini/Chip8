@@ -11,7 +11,7 @@ import javafx.scene.paint.Color;
 public class Screen extends Canvas {
 
 	private static final Color BG = Color.BLACK;
-	private static final Color FG = Color.LIME;
+	private static final Color FG = Color.WHITE;
 
 	private static final int GFX_WIDTH = 64;
 	private static final int GFX_HEIGHT = 32;
@@ -34,7 +34,6 @@ public class Screen extends Canvas {
 		gfx = new byte[GFX_WIDTH * GFX_HEIGHT];
 		gc = getGraphicsContext2D();
 
-		
 		widthProperty().addListener((obs, oldV, newV) -> {
 			if (oldV != null) {
 				gc.clearRect(0, 0, oldV.doubleValue(), getHeight());

@@ -6,7 +6,7 @@
 <?import javafx.scene.layout.Pane?>
 <?import mini.chip8.Screen?>
 
-<AnchorPane onKeyPressed="#keyDown" onKeyReleased="#keyUp" prefHeight="531.0" prefWidth="767.0" xmlns="http://javafx.com/javafx/8.0.171" xmlns:fx="http://javafx.com/fxml/1" fx:controller="mini.chip8.MainController">
+<AnchorPane onKeyPressed="#keyDown" onKeyReleased="#keyUp" prefHeight="360.0" prefWidth="640.0" xmlns="http://javafx.com/javafx/8.0.171" xmlns:fx="http://javafx.com/fxml/1" fx:controller="mini.chip8.MainController">
    <children>
       <Pane layoutY="499.0" style="-fx-background-color: black;" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="40.0">
          <children>
@@ -15,6 +15,7 @@
       </Pane>
       <ToolBar layoutX="7.0" layoutY="7.0" prefHeight="40.0" prefWidth="200.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
         <items>
+            <Button fx:id="stateButton" mnemonicParsing="false" onAction="#statePressed" prefHeight="27.0" prefWidth="81.0" text="State" />
             <Button fx:id="loadButton" mnemonicParsing="false" onAction="#loadPressed" prefHeight="27.0" prefWidth="81.0" text="Load" />
             <Button fx:id="runButton" disable="true" mnemonicParsing="false" onAction="#runPressed" prefHeight="27.0" prefWidth="81.0" text="Run" />
             <Button fx:id="haltButton" disable="true" mnemonicParsing="false" onAction="#haltPressed" prefHeight="27.0" prefWidth="81.0" text="Halt" />
