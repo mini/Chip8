@@ -11,7 +11,7 @@ import mini.chip8.Chip8.StateListener;
 public class StateController implements StateListener {
 	//@formatter:off
 	@FXML private TextField pcTextField;
-	@FXML private TextField iTextField;
+	@FXML private TextField opcodeTextField;
 	@FXML private TextField delayTextField;
 	@FXML private TextField soundTextField;
 	@FXML private ListView<Integer> regList;
@@ -22,7 +22,7 @@ public class StateController implements StateListener {
 	@Override
 	public void update(State s) {
 		pcTextField.textProperty().set(String.format("0x%03X", s.s_pc));
-		iTextField.textProperty().set(String.format("0x%04X", s.s_opcode));
+		opcodeTextField.textProperty().set(String.format("0x%04X", s.s_opcode));
 		delayTextField.textProperty().set(String.format("%03d", s.s_delayTimer));
 		soundTextField.textProperty().set(String.format("%03d", s.s_soundTimer));
 		
@@ -30,6 +30,7 @@ public class StateController implements StateListener {
 		for(int v : s.s_regs) {
 			regs.add(v);
 		}
+		regs.add(s.s_I);
 		regList.setItems(regs);
 		
 		ObservableList<String> stack = FXCollections.<String>observableArrayList();

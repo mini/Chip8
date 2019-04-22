@@ -31,8 +31,8 @@
             </AnchorPane>
             <AnchorPane prefHeight="200.0" prefWidth="200.0" GridPane.columnIndex="1">
                <children>
-                  <Label layoutX="67.0" layoutY="6.0" text="I Register" AnchorPane.topAnchor="6.0" />
-                  <TextField fx:id="iTextField" alignment="CENTER" editable="false" layoutX="14.0" layoutY="24.0" promptText="0xFFF" />
+                  <Label layoutX="67.0" layoutY="6.0" text="Op Code" AnchorPane.topAnchor="6.0" />
+                  <TextField fx:id="opcodeTextField" alignment="CENTER" editable="false" layoutX="14.0" layoutY="24.0" promptText="0xFFF" />
                </children>
             </AnchorPane>
             <AnchorPane prefHeight="200.0" prefWidth="200.0" GridPane.rowIndex="1">
@@ -60,13 +60,13 @@
             <AnchorPane>
                <children>
                   <Label alignment="CENTER" contentDisplay="CENTER" layoutY="-8.0" prefHeight="25.0" prefWidth="97.0" text="Stack" textAlignment="CENTER" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="-8.0" />
-                  <ListView fx:id="stackList" layoutY="17.0" prefHeight="423.0" prefWidth="97.0" />
+                  <ListView fx:id="stackList" layoutY="17.0" prefHeight="408.0" prefWidth="97.0" />
                </children>
             </AnchorPane>
             <AnchorPane>
                <children>
                   <Label alignment="CENTER" contentDisplay="CENTER" layoutY="-8.0" prefHeight="25.0" prefWidth="97.0" text="Key" textAlignment="CENTER" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="-8.0" />
-                  <ListView fx:id="keyList" layoutY="17.0" prefHeight="423.0" prefWidth="97.0" />
+                  <ListView fx:id="keyList" layoutY="17.0" prefHeight="408.0" prefWidth="97.0" />
                </children>
             </AnchorPane>
          </children>
@@ -149,6 +149,11 @@
                </font>
             </Label>
             <Label alignment="CENTER" prefHeight="25.0" prefWidth="68.0" text="F">
+               <font>
+                  <Font name="System Bold" size="14.0" />
+               </font>
+            </Label>
+            <Label alignment="CENTER" prefHeight="25.0" prefWidth="68.0" text="I">
                <font>
                   <Font name="System Bold" size="14.0" />
                </font>
